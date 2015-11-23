@@ -11,6 +11,7 @@ import android.widget.EditText;
 
 /**
  * Created by apple on 11/22/15.
+ *
  */
 public class CrimeFragment extends Fragment {
     private Crime mCrime;
