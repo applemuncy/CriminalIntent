@@ -1,5 +1,6 @@
 package org.bloominglabs.apple.criminalintent;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -55,6 +56,9 @@ public class CrimeListFragment extends Fragment {
             Toast.makeText(getActivity(),
                     mCrime.getTitle() + " clicked!" , Toast.LENGTH_LONG)
                     .show();
+
+            Intent intent = CrimeActivity.newInent(getActivity(), mCrime.getId());
+            startActivity(intent);
         }
 
         public  void bindCrime(Crime crime){
