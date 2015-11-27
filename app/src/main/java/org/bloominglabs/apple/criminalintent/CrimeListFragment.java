@@ -57,7 +57,7 @@ public class CrimeListFragment extends Fragment {
                     mCrime.getTitle() + " clicked!" , Toast.LENGTH_LONG)
                     .show();
 
-            Intent intent = new Intent(getActivity(),CrimeActivity.class);
+            Intent intent = CrimeActivity.newInent(getActivity(), mCrime.getId());
             startActivity(intent);
         }
 
