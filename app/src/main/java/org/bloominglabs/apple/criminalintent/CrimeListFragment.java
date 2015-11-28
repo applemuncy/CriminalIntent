@@ -99,10 +99,20 @@ public class CrimeListFragment extends Fragment {
     }
     private void updateUI(){
         CrimeLab crimeLab = CrimeLab.get(getActivity());
-        List<Crime> crimes =crimeLab.getCrimes();
+        List<Crime> crimes = crimeLab.getCrimes();
 
-        mAdapter = new CrimeAdapter(crimes);
-        mCrimeRecyclerView.setAdapter(mAdapter);
+        if ( mAdapter == null ) {
+            mAdapter = new CrimeAdapter(crimes);
+            mCrimeRecyclerView.setAdapter(mAdapter);
+        } else {
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public  void onResume(){
+        super.onResume();
+        updateUI();
     }
 
 }
