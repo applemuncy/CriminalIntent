@@ -2,10 +2,12 @@ package org.bloominglabs.apple.criminalintent;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 
 import org.bloominglabs.apple.criminalintent.database.CrimeBaseHelper;
+import org.bloominglabs.apple.criminalintent.database.CrimeCursorWrapper;
 import org.bloominglabs.apple.criminalintent.database.CrimeDbSchema.CrimeTable;
 
 import java.util.ArrayList;
@@ -39,12 +41,40 @@ public class CrimeLab {
 
     public List<Crime> getCrimes(){
 
-        return new ArrayList<>();
+        List<Crime> crimes = new ArrayList<>();
+
+        CrimeCursorWrapper cursor = queryCrimes(null, null);
+
+        try {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()){
+                crimes.add(cursor.getCrime());
+                cursor.moveToNext();
+            }
+        }finally {
+            cursor.close();
+        }
+        return crimes;
     }
 
     public Crime getCrime(UUID id){
 
-        return null;
+        CrimeCursorWrapper cursor = queryCrimes(
+                CrimeTable.Cols.UUID + " = ?",
+                new String[] {id.toString()}
+
+        );
+
+        try {
+            if (cursor.getCount() == 0){
+                return null;
+            }
+            cursor.moveToFirst();
+            return cursor.getCrime();
+
+        }finally {
+            cursor.close();
+        }
     }
 
     public void addCrime(Crime c){
@@ -60,8 +90,8 @@ public class CrimeLab {
         ContentValues values = getContentValues(crime);
 
         mDatabase.update(CrimeTable.NAME, values,
-                Cols.UUID + " ?",
-                new String[]{ uuidString });
+                Cols.UUID + " = ?",
+                new String[]{uuidString});
 
     }
 
@@ -71,9 +101,24 @@ public class CrimeLab {
         values.put(Cols.UUID, crime.getId().toString());
         values.put(Cols.TITLE, crime.getTitle());
         values.put(Cols.DATE, crime.getDate().getTime());
-        values.put(Cols.SOLVED, crime.isSolved()? 1 : 0);
+        values.put(Cols.SOLVED, crime.isSolved() ? 1 : 0);
 
         return values;
 
+    }
+
+    private CrimeCursorWrapper queryCrimes(String whereClause, String[] whereArgs){
+
+        Cursor cursor = mDatabase.query(
+                CrimeTable.NAME,
+                null,
+                whereClause,
+                whereArgs,
+                null,
+                null,
+                null
+
+        );
+        return new CrimeCursorWrapper( cursor);
     }
 }
