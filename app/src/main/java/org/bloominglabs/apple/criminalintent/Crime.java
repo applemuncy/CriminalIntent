@@ -48,7 +48,12 @@ public class Crime {
 
     public Crime (){
         //generate unique identifier
-        mId = UUID.randomUUID();
+        this(UUID.randomUUID());
+
+    }
+
+    public Crime(UUID id){
+        mId = id;
         mDate = new Date();
     }
 
