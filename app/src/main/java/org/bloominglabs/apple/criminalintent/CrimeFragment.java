@@ -2,6 +2,9 @@ package org.bloominglabs.apple.criminalintent;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,11 +32,13 @@ public class CrimeFragment extends Fragment {
     private Button mDateButton;
     private CheckBox mSolvedCheckBox;
     private Button mReportButton;
+    private Button mSuspectButton;
 
     private static final String ARG_CRIME_ID = "crime_Id";
     private static final String DIALOG_DATE = "DialogDate";
 
     private static final int REQUEST_DATE = 0;
+    private static final int REQUEST_CONTACT = 1;
 
 
     @Override
@@ -108,11 +113,27 @@ public class CrimeFragment extends Fragment {
                  i.setType("plain/text");
                  i.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
                  i.putExtra(Intent.EXTRA_SUBJECT,
-                         getString(R.string.crime_report_suspcet));
+                         getString(R.string.crime_report_subject));
                  startActivity(i);
 
              }
         });
+
+        final Intent pickContact = new Intent(Intent.ACTION_PICK,
+                ContactsContract.Contacts.CONTENT_URI);
+
+        mSuspectButton = (Button) v.findViewById(R.id.crime_suspect);
+        mSuspectButton.setOnClickListener(new View.OnClickListener(){
+
+            public void onClick(View v){
+                startActivityForResult(pickContact, REQUEST_CONTACT);
+            }
+        });
+
+        if (mCrime.getSuspect() != null){
+            mSuspectButton.setText(mCrime.getSuspect());
+        }
+
 
         return v;
     }
@@ -136,6 +157,27 @@ public class CrimeFragment extends Fragment {
 
             mCrime.setDate(date);
             updateDate();
+        }else if ( requestCode == REQUEST_CONTACT && data != null){
+
+            Uri contactUri = data.getData();
+            String[] querryFields = new String[] {
+                    ContactsContract.Contacts.DISPLAY_NAME
+            };
+
+            Cursor c = getActivity().getContentResolver()
+                    .query(contactUri, querryFields, null, null, null);
+            try {
+                if (c.getCount() == 0){
+                    return;
+                }
+                c.moveToFirst();
+                String suspect = c.getString(0);
+                mCrime.setSuspect(suspect);
+                mSuspectButton.setText(suspect);
+
+            }finally {
+                c.close();
+            }
         }
     }
 
