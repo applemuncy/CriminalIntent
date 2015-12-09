@@ -18,7 +18,7 @@ import java.util.UUID;
  * Created by apple on 11/28/15.
  *
  */
-public class CrimePagerActivity extends AppCompatActivity {
+public class CrimePagerActivity extends AppCompatActivity implements  CrimeFragment.Callbacks{
 
 //    public void CrimePagerActivity() {
     private static final String EXTRA_CRIME_ID = "org.bloominglabs.apple.criminalintent.crime_id";
@@ -66,6 +66,10 @@ public class CrimePagerActivity extends AppCompatActivity {
                 break;
             }
         }
+
+    }
+    @Override
+    public void onCrimeUpdated(Crime crime){
 
     }
 }
